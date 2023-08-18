@@ -5,20 +5,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
     <div class="container">
-        <form action="/login" method="POST">
+        <form id="loginForm">
             <label for="name">Enter Name:</label>
-            <input type="text" name="name" >
+            <input type="text" name="name">
             <label for="email">Enter Email:</label>
-            <input type="text" name="email" >
+            <input type="text" name="email">
             <label for="password">Enter Password</label>
             <input type="password" name="password" required>
             <button>Sign Up</button>
         </form>
+        <form action="/login"> <button>Login</button></form>
+        <hr>
+        <div id="manifest">
+
+        </div>
     </div>
+    <script>
+
+        const loginForm = document.getElementById('loginForm');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(loginForm);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const password = formData.get('password');
+            const object = {
+                name,
+                email,
+                password
+            }
+
+            try {
+                const response = await axios.post('http://localhost:3000/login', object);
+
+                if (response.status === 200) {
+                    const manifest = document.getElementById('manifest');
+                    manifest.innerHTML = `<p>User Created : ${response.statusText}</p>`;
+                } else if (response.status === 401) {
+                    const manifest = document.getElementById('manifest');
+                    manifest.innerHTML = `<p>User already exists</p>`;
+                } else if(response.status === 405) {
+                    const manifest = document.getElementById('manifest');
+                    manifest.innerHTML = `<p>: Input field is empty ${response.statusText}</p>`;
+                }
+            } catch (err) {
+                console.log(err);
+                const manifest = document.getElementById('manifest');
+                manifest.innerHTML = `<p>Error: ${err.message}</p>`;
+            }
+
+
+
+        });
+
+
+    </script>
 </body>
 
 </html>

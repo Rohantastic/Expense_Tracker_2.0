@@ -10,40 +10,22 @@ exports.signUpCredentials = (req, res) => {
 exports.postCredentials = async (req, res) => {
     const { name, email, password } = req.body;
 
-    if (name.length <= 0 || email === undefined || password === undefined){
-
+    if (name.length <= 0 || email === undefined || password === undefined) {
         const errorMessage = "Please fill out all fields.";
-        return res.send(`
-        <p style="color: red;">${errorMessage}</p>
-        <form action="/login" method="get">
-            <button>Back</button>
-        </form>
-    `);
-    }
-    else {
+        res.status(405).json({error:" input value is null"});
+    } else {
         try {
             const existingUser = await ExpenseModel.findOne({ where: { email: email } });
 
             if (existingUser) {
-
-                setTimeout(() => {
-                    return res.send(`
-                        USER ALREADY EXISTS!! PRESS BACK TO REGISTER NEW USER
-    
-                        <form action="/login" method='get'>
-                        <input type="hidden">
-                        <button>Back</button>
-                        </form>
-                    `)
-                }, 100
-                );
-
-            } else {
+                const string = path.join(__dirname, '../', '/views/signup.html');
+                return res.status(401).json({ error: 'User already exists' });
+            }
+            else {
                 await ExpenseModel.create({ name, email, password }).then(() => {
-                    res.status(201);
-                    return res.redirect('/');
+                    return res.status(201);
                 })
-                    .catch(error => {
+                .catch(error => {
                         console.error('Error creating user:', error);
                         return res.status(500).send('Internal server error');
                     });

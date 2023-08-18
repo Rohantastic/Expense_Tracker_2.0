@@ -13,7 +13,6 @@ route.post('/login',controller.postCredentials);
 //login
 route.get('/login',controller.loginCredentials);
 
-
 //user when logs in
 route.post('/loggedin',controller.userLogIn)
 
