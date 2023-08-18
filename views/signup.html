@@ -10,13 +10,13 @@
 
 <body>
     <div class="container">
-        <form id="loginForm">
+        <form id="signUpForm">
             <label for="name">Enter Name:</label>
-            <input type="text" name="name">
+            <input type="text" name="name" required id="name">
             <label for="email">Enter Email:</label>
-            <input type="text" name="email">
+            <input type="text" name="email"  required id="email">
             <label for="password">Enter Password</label>
-            <input type="password" name="password" required>
+            <input type="password" name="password" required id="password">
             <button>Sign Up</button>
         </form>
         <form action="/login"> <button>Login</button></form>
@@ -27,11 +27,11 @@
     </div>
     <script>
 
-        const loginForm = document.getElementById('loginForm');
+        const signUpForm = document.getElementById('signUpForm');
 
-        loginForm.addEventListener('submit', async (e) => {
+        signUpForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(loginForm);
+            const formData = new FormData(signUpForm);
             const name = formData.get('name');
             const email = formData.get('email');
             const password = formData.get('password');
@@ -40,28 +40,45 @@
                 email,
                 password
             }
+            
+            //so to input fields get emptied once signed up.
+            const EmptyNameField = document.getElementById('name');
+            const EmptyEmailField = document.getElementById('email');
+            const EmptyPasswordField = document.getElementById('password');
+
 
             try {
                 const response = await axios.post('http://localhost:3000/login', object);
 
-                if (response.status === 200) {
+                if (response.status === 201) {
                     const manifest = document.getElementById('manifest');
-                    manifest.innerHTML = `<p>User Created : ${response.statusText}</p>`;
+                    manifest.innerHTML = `<p>User : ${response.statusText}</p>`;
+                    EmptyNameField.value = "" ; //field gets empty
+                    EmptyEmailField.value = "" ; //field gets empty
+                    EmptyPasswordField.value = "" ; //field gets empty
                 } else if (response.status === 401) {
                     const manifest = document.getElementById('manifest');
                     manifest.innerHTML = `<p>User already exists</p>`;
+                    EmptyNameField.value = "" ; //field gets empty
+                    EmptyEmailField.value = "" ; //field gets empty
+                    EmptyPasswordField.value = "" ; //field gets empty
                 } else if(response.status === 405) {
                     const manifest = document.getElementById('manifest');
                     manifest.innerHTML = `<p>: Input field is empty ${response.statusText}</p>`;
+                    EmptyNameField.value = "" ; //field gets empty
+                    EmptyEmailField.value = "" ; //field gets empty
+                    EmptyPasswordField.value = "" ; //field gets empty
                 }
             } catch (err) {
                 console.log(err);
                 const manifest = document.getElementById('manifest');
                 manifest.innerHTML = `<p>Error: ${err.message}</p>`;
+                EmptyNameField.value = "" ; //field gets empty
+                EmptyEmailField.value = "" ; //field gets empty
+                EmptyPasswordField.value = "" ; //field gets empty
+                
             }
-
-
-
+        
         });
 
 

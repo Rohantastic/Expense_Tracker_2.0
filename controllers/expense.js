@@ -1,4 +1,5 @@
 const path = require('path');
+const bcrypt = require('bcrypt');
 const ExpenseModel = require('../models/expense');
 
 exports.signUpCredentials = (req, res) => {
@@ -11,31 +12,38 @@ exports.postCredentials = async (req, res) => {
     const { name, email, password } = req.body;
 
     if (name.length <= 0 || email === undefined || password === undefined) {
-        const errorMessage = "Please fill out all fields.";
-        res.status(405).json({error:" input value is null"});
+        throw new Error("Error in length");
     } else {
         try {
             const existingUser = await ExpenseModel.findOne({ where: { email: email } });
 
             if (existingUser) {
-                const string = path.join(__dirname, '../', '/views/signup.html');
                 return res.status(401).json({ error: 'User already exists' });
             }
             else {
-                await ExpenseModel.create({ name, email, password }).then(() => {
-                    return res.status(201);
-                })
-                .catch(error => {
-                        console.error('Error creating user:', error);
-                        return res.status(500).send('Internal server error');
+
+                try {
+                    bcrypt.hash(password, 10, async (err, hash) => {
+                        const isDataCreated = await ExpenseModel.create({ name, email, password: hash })
+                        if (isDataCreated) {
+                            return res.status(201).json({success:true});
+                        } else {
+                            throw new Error("User cannot be created");
+                        }
                     });
+
+                } catch (err) {
+                    return res.status(500).json({error:"error in signing up"});
+                }
+
             }
         } catch (error) {
-            console.error('Error creating user:', error);
-            return res.status(500).send('Internal server error');
+            return res.status(500).json({error:"error in catch of signing up"});
         }
     }
 };
+
+
 
 
 //login the credentials
@@ -45,21 +53,34 @@ exports.loginCredentials = (req, res, next) => {
     res.sendFile(string);
 }
 
+
+//when user logs in
 exports.userLogIn = async (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
-    //const existingUser = await ExpenseModel.findOne({ where: { email: email } });
-    try {
-        const userFromDatabase = await ExpenseModel.findOne({ where: { email: email } });
-        if (userFromDatabase) {
-            if (userFromDatabase.password === password) {
-                res.status(200).send(`<h1> Login Successful </h1>`);
-            } else {
-                res.status(401).send(`<h1> User Not Authorized, Password Not Matched !! </h1>`);
-            }
-        }
-    } catch (err) {
-        res.status(404).send(`<h1> User Not Found !! </h1>`);
-    }
 
-}
+    try {
+        const user = await ExpenseModel.findOne({ where: { email: email } });
+        
+        const userEmail = user.email; 
+        if (userEmail!==email) {
+            return res.status(401).json({ error: "user not found in bcrypt" });
+        }
+        else {
+
+            bcrypt.compare(password, user.password, (err, result) => {
+                if (result) {
+                    res.status(200).json({ error: "successfully found the password in bcrypt" });
+                } 
+                else {
+                    res.status(401).json({ error: "password doesnt match" });
+                }
+            });
+        }
+    } catch (error) {
+
+        console.log('................................................................');
+        console.log(error);
+        return res.status(500).json({error:"User Not Found"});
+    }
+};
