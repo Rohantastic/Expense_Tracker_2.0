@@ -73,7 +73,7 @@ exports.userLogIn = async (req, res, next) => {
             if (userFromDatabase.password === password) {
                 res.status(200).send(`<h1> Login Successful </h1>`);
             } else {
-                res.status(404).send(`<h1> User Not Found !! </h1>`);
+                res.status(401).send(`<h1> User Not Authorized, Password Not Matched !! </h1>`);
             }
         }
     } catch (err) {
