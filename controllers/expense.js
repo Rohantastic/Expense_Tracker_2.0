@@ -22,3 +22,13 @@ exports.postExpense = async (req,res,next) =>{
         console.log(err);
     }
 }
+
+exports.getExpenses = async (req, res, next) => {
+    try {
+        const expenses = await ExpenseModel.findAll();
+        return res.status(200).json({ expenses });
+    } catch (error) {
+        console.error('Error fetching expenses:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};

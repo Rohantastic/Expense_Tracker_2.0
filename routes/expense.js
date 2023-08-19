@@ -10,4 +10,7 @@ route.get('/addExpense',ExpenseController.addExpense);
 //posting the expense after log in
 route.post('/addExpense',ExpenseController.postExpense);
 
+
+route.get('/getExpenses', ExpenseController.getExpenses);
+
 module.exports = route;

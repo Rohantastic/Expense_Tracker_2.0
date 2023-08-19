@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
+
 <body>
     <form onsubmit="addNewExpenses(event)">
-        
+
         <label for="expense">Add Expense</label>
         <input type="number" name="expense" required>
 
@@ -27,29 +29,45 @@
 
     </div>
     <script>
-        function addNewExpenses(e){
+        //will be envoked by onclick from form
+        function addNewExpenses(e) {
             e.preventDefault();
-            const expenseDetails= {
+            const expenseDetails = {
                 expense: e.target.expense.value,
                 description: e.target.description.value,
-                category : e.target.category.value
+                category: e.target.category.value
             }
-            console.log(expenseDetails);
+            console.log(expenseDetails);//checking the object of details
 
-            axios.post('http://localhost:3000/expense/addExpense',expenseDetails).then((response)=>{
-                if(response.status === 201){
-                    addNewExpenseToUI(response.data)
-                }else{
+            //sending post call to store details in database
+            axios.post('http://localhost:3000/expense/addExpense', expenseDetails).then((response) => {
+                if (response.status === 201) { 
+                    fetchDataFromDatabase(); //fetching the data from database (retrieving).
+                } else {
                     console.log("err");
                 }
             });
+        };
 
-            function addNewExpenseToUI(expense){
-                const manifest = document.getElementById('manifest');
-                let list = `<li> ${expense.success} with id: ${expense.expenseId} </li>`;
-                manifest.innerHTML += list;
-            }
+
+         function fetchDataFromDatabase() { //function to get/fetch data from database
+            axios.get('http://localhost:3000/expense/getExpenses').then((response) => {
+                showDataFromDatabase(response.data.expenses); //sending to function to display the data, check controller - how json is sending data to html
+            }).catch(err=>console.log(err));
         }
+
+        function showDataFromDatabase(expense) { //function to display data
+                const manifest = document.getElementById('manifest');
+                manifest.innerHTML = '';
+                expense.forEach((element) => {
+                    let string = `<li> ID: ${element.id} Expense: ${element.expense} Category: ${element.category} Description: ${element.description} <button>Delete</button> </li>`;
+                    manifest.innerHTML += string;
+                });
+            }
+
+
+        fetchDataFromDatabase();//calling function (function call).
     </script>
 </body>
+
 </html>
