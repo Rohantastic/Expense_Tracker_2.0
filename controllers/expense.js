@@ -32,3 +32,16 @@ exports.getExpenses = async (req, res, next) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+exports.deleteExpense = async (req,res,next) =>{
+    const id = req.params.id;
+    try{
+        const hasDeleted = await ExpenseModel.destroy({where:{id:id}});
+        if(hasDeleted){
+            return res.status(204).json({success:true});
+        }
+    }catch(err){
+        console.log(err);
+        res.status(500).json({error:"Error in delete Expense"});
+    }
+}

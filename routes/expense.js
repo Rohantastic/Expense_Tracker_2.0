@@ -11,6 +11,10 @@ route.get('/addExpense',ExpenseController.addExpense);
 route.post('/addExpense',ExpenseController.postExpense);
 
 
+//fetching the expenses from database
 route.get('/getExpenses', ExpenseController.getExpenses);
+
+//deleting the expense through id
+route.delete('/deleteExpense/:id',ExpenseController.deleteExpense);
 
 module.exports = route;
