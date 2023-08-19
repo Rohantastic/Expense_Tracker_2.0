@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const database = require('../config/database');
+//const User = require('./User');
 
 const Expense = database.define('expense',{
     id:{
@@ -21,7 +22,5 @@ const Expense = database.define('expense',{
     timestamps:false
 });
 
-
-Expense.sync({alter:true});
 
 module.exports = Expense;

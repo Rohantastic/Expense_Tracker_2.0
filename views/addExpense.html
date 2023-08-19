@@ -29,6 +29,10 @@
 
     </div>
     <script>
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        console.log("------------------------------",id);
         //will be envoked by onclick from form
         function addNewExpenses(e) {
             e.preventDefault();
@@ -41,7 +45,7 @@
 
             //sending post call to store details in database
             axios.post('http://localhost:3000/expense/addExpense', expenseDetails).then((response) => {
-                if (response.status === 201) { 
+                if (response.status === 201) {
                     fetchDataFromDatabase(); //fetching the data from database (retrieving).
                 } else {
                     console.log("err");
@@ -50,24 +54,24 @@
         };
 
 
-         function fetchDataFromDatabase() { //function to get/fetch data from database
+        function fetchDataFromDatabase() { //function to get/fetch data from database
             axios.get('http://localhost:3000/expense/getExpenses').then((response) => {
                 showDataFromDatabase(response.data.expenses); //sending to function to display the data, check controller - how json is sending data to html
-            }).catch(err=>console.log(err));
+            }).catch(err => console.log(err));
         }
 
         function showDataFromDatabase(expense) { //function to display data
-                const manifest = document.getElementById('manifest');
-                manifest.innerHTML = '';
-                expense.forEach((element) => {
-                    let string = `<li> ID: ${element.id} Expense: ${element.expense} Category: ${element.category} Description: ${element.description} <button onclick="deleteExpense(${element.id})"> Delete </button> </li>`;
-                    manifest.innerHTML += string;
-                });
-            }
+            const manifest = document.getElementById('manifest');
+            manifest.innerHTML = '';
+            expense.forEach((element) => {
+                let string = `<li> ID: ${element.id} Expense: ${element.expense} Category: ${element.category} Description: ${element.description} <button onclick="deleteExpense(${element.id})"> Delete </button> </li>`;
+                manifest.innerHTML += string;
+            });
+        }
 
-        async function deleteExpense(id){
-           const response = await axios.delete(`http://localhost:3000/expense/deleteExpense/${id}`);
-            if(response.status === 204){
+        async function deleteExpense(id) {
+            const response = await axios.delete(`http://localhost:3000/expense/deleteExpense/${id}`);
+            if (response.status === 204) {
                 fetchDataFromDatabase();
                 console.log("Deleted");
             }

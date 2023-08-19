@@ -51,7 +51,9 @@
                     EmptyNameField.value = "" ; //field gets empty
                     EmptyEmailField.value = "" ; //field gets empty
                     EmptyPasswordField.value = "" ; //field gets empty
-                    window.location.href = '/expense/addExpense';
+                    
+                    const id = responseFromPost.data.id;
+                    window.location.href = `/expense/addExpense?id=${id}`;
                     
                 } else {
                     manifest.innerHTML = `<p> Error in logging </p>`;

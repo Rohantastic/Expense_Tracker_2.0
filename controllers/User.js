@@ -70,7 +70,7 @@ exports.userLogIn = async (req, res, next) => {
 
             bcrypt.compare(password, user.password, (err, result) => {
                 if (result) {
-                    res.status(200).json({ error: "successfully found the password in bcrypt" });
+                    res.status(200).json({ message: "successfully found the password in bcrypt", id: user.id});
                 } 
                 else {
                     res.status(401).json({ error: "password doesnt match" });

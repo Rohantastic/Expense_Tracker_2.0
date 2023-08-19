@@ -1,5 +1,6 @@
 const {Sequelize,DataTypes} = require('sequelize');
 const database = require('../config/database');
+//const Expense = require('./expense');
 
 const User = database.define('user',{
     id: {
@@ -29,7 +30,7 @@ const User = database.define('user',{
 });
 
 
-User.sync({alter:true});
+
 
 
 module.exports = User;
