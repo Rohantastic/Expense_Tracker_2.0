@@ -10,7 +10,7 @@
 
 <body>
     <div class="container">
-        <form id="loginForm">
+        <form id="loginForm" >
             <label for="name">Enter Name:</label>
             <input type="text" name="name" id="name" required>
             <label for="email">Enter Email:</label>
@@ -19,7 +19,7 @@
             <input type="password" name="password" id="password" required>
             <button>Log in</button>
         </form>
-        <a href="/signup">Sign up</a>
+        <a href="/user/signup">Sign up</a>
         <hr>
         <div id="manifest">
 
@@ -40,7 +40,7 @@
             const EmptyPasswordField = document.getElementById('password');
 
             try {
-                const responseFromPost = await axios.post('http://localhost:3000/loggedin', {
+                const responseFromPost = await axios.post('http://localhost:3000/user/loggedin', {
                     name, email, password
                 });
 
@@ -51,6 +51,8 @@
                     EmptyNameField.value = "" ; //field gets empty
                     EmptyEmailField.value = "" ; //field gets empty
                     EmptyPasswordField.value = "" ; //field gets empty
+                    window.location.href = '/expense/addExpense';
+                    
                 } else {
                     manifest.innerHTML = `<p> Error in logging </p>`;
                     EmptyNameField.value = "" ; //field gets empty

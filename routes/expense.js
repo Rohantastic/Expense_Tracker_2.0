@@ -1,19 +1,13 @@
 const express = require('express');
-
-const controller = require('../controllers/expense');
 const route = express.Router();
+const ExpenseController = require('../controllers/expense');
 
 
-//signup page
-route.get('/signup',controller.signUpCredentials);
 
-//signup posting into db
-route.post('/login',controller.postCredentials);
+//after user logs in
+route.get('/addExpense',ExpenseController.addExpense);
 
-//login
-route.get('/login',controller.loginCredentials);
-
-//user when logs in
-route.post('/loggedin',controller.userLogIn)
+//posting the expense after log in
+route.post('/addExpense',ExpenseController.postExpense);
 
 module.exports = route;

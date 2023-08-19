@@ -19,7 +19,7 @@
             <input type="password" name="password" required id="password">
             <button>Sign Up</button>
         </form>
-        <form action="/login"> <button>Login</button></form>
+        <form action="/user/login"> <button>Login</button></form>
         <hr>
         <div id="manifest">
 
@@ -48,7 +48,7 @@
 
 
             try {
-                const response = await axios.post('http://localhost:3000/login', object);
+                const response = await axios.post('http://localhost:3000/user/login', object);
 
                 if (response.status === 201) {
                     const manifest = document.getElementById('manifest');

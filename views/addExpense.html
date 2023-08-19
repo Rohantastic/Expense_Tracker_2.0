@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <form onsubmit="addNewExpenses(event)">
+        
+        <label for="expense">Add Expense</label>
+        <input type="number" name="expense" required>
+
+        <label for="description">Add description</label>
+        <input type="text" name="description" required>
+
+        <label for="category">Category</label>
+        <select name="category">
+            <option value="1">Fuel</option>
+        </select>
+        <button>Add</button>
+    </form>
+    <hr>
+
+    <div id="manifest">
+
+    </div>
+    <script>
+        function addNewExpenses(e){
+            e.preventDefault();
+            const expenseDetails= {
+                expense: e.target.expense.value,
+                description: e.target.description.value,
+                category : e.target.category.value
+            }
+            console.log(expenseDetails);
+
+            axios.post('http://localhost:3000/expense/addExpense',expenseDetails).then((response)=>{
+                if(response.status === 201){
+                    addNewExpenseToUI(response.data)
+                }else{
+                    console.log("err");
+                }
+            });
+
+            function addNewExpenseToUI(expense){
+                const manifest = document.getElementById('manifest');
+                let list = `<li> ${expense.success} with id: ${expense.expenseId} </li>`;
+                manifest.innerHTML += list;
+            }
+        }
+    </script>
+</body>
+</html>
