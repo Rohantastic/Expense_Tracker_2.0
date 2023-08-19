@@ -3,7 +3,7 @@ const app = express();
 const UserRoute = require('./routes/User');
 const ExpenseRoute = require('./routes/expense');
 const bodyParser = require('body-parser');
-const sequelize = require('./config/database'); // Import Sequelize instance
+const sequelize = require('./config/database');
 const User = require('./models/User');
 const Expense = require('./models/expense');
 
@@ -27,6 +27,6 @@ User.hasMany(Expense);
 Expense.belongsTo(User);
 
 app.listen(3000, (err) => {
-    console.log('Server is running on port 3000');
+    console.log('Server Initialised...');
     console.error(err);
 });

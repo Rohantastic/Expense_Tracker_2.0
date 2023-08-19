@@ -53,7 +53,8 @@
                     EmptyPasswordField.value = "" ; //field gets empty
                     
                     const id = responseFromPost.data.id;
-                    window.location.href = `/expense/addExpense?id=${id}`;
+                    localStorage.setItem('token',responseFromPost.data.token); //storing token in local storage
+                    window.location.href = `/expense/addExpense`;
                     
                 } else {
                     manifest.innerHTML = `<p> Error in logging </p>`;

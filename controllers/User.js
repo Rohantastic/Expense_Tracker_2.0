@@ -1,6 +1,12 @@
 const path = require('path');
 const bcrypt = require('bcrypt');
 const UserModel =  require('../models/User');
+const jwt = require('jsonwebtoken');
+
+
+function generateAccessToken(id){
+    return jwt.sign({userId:id},"b6b5742d7d780baf8e42d5c3e41e6e3a25dcf8df05b26c3d6e21c03f531e4928");//secret key
+}
 
 exports.signUpCredentials = (req, res) => {
     const string = path.join(__dirname, '../', '/views/signup.html');
@@ -18,7 +24,7 @@ exports.postCredentials = async (req, res) => {
             const existingUser = await UserModel.findOne({ where: { email: email } });
 
             if (existingUser) {
-                return res.status(401).json({ error: 'User already exists' });
+                return res.status(401).json({ error: 'User already exists'});
             }
             else {
 
@@ -70,7 +76,7 @@ exports.userLogIn = async (req, res, next) => {
 
             bcrypt.compare(password, user.password, (err, result) => {
                 if (result) {
-                    res.status(200).json({ message: "successfully found the password in bcrypt", id: user.id});
+                    res.status(200).json({ message: "successfully found the password in bcrypt", token: generateAccessToken(user.id)});
                 } 
                 else {
                     res.status(401).json({ error: "password doesnt match" });

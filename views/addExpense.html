@@ -30,16 +30,17 @@
     </div>
     <script>
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
-        console.log("------------------------------",id);
+        // const urlParams = new URLSearchParams(window.location.search); //function to fetch the value from url 
+        // const id = urlParams.get('id');
+        // console.log("------------------------------",id);
+
         //will be envoked by onclick from form
         function addNewExpenses(e) {
             e.preventDefault();
             const expenseDetails = {
                 expense: e.target.expense.value,
                 description: e.target.description.value,
-                category: e.target.category.value
+                category: e.target.category.value,
             }
             console.log(expenseDetails);//checking the object of details
 
@@ -55,7 +56,8 @@
 
 
         function fetchDataFromDatabase() { //function to get/fetch data from database
-            axios.get('http://localhost:3000/expense/getExpenses').then((response) => {
+            const token = localStorage.getItem('token');
+            axios.get('http://localhost:3000/expense/getExpenses',{headers: {"Authorization":token}}).then((response) => {
                 showDataFromDatabase(response.data.expenses); //sending to function to display the data, check controller - how json is sending data to html
             }).catch(err => console.log(err));
         }
@@ -64,7 +66,7 @@
             const manifest = document.getElementById('manifest');
             manifest.innerHTML = '';
             expense.forEach((element) => {
-                let string = `<li> ID: ${element.id} Expense: ${element.expense} Category: ${element.category} Description: ${element.description} <button onclick="deleteExpense(${element.id})"> Delete </button> </li>`;
+                let string = `<li> ID: ${element.id} Expense: ${element.expense} Category: ${element.category} Description: ${element.description} userID: ${element.userId} <button onclick="deleteExpense(${element.id})"> Delete </button> </li>`;
                 manifest.innerHTML += string;
             });
         }

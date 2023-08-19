@@ -13,8 +13,9 @@ exports.postExpense = async (req,res,next) =>{
     const expense = req.body.expense;
     const category = req.body.category;
     const description = req.body.description;
+    const userId = req.body.userId;
     try{
-        const hasDataStored = await ExpenseModel.create({expense,category,description});
+        const hasDataStored = await ExpenseModel.create({expense,category,description,userId});
         if(hasDataStored){
             return res.status(201).json({success:"Expense Data has been created",expenseId: hasDataStored.id});
         }
