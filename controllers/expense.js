@@ -1,5 +1,6 @@
 const path = require('path');
 const ExpenseModel = require('../models/expense');
+const User = require('../models/User');
 
 exports.addExpense = (req,res,next) =>{
     const string = path.join(__dirname, '../', '/views/addExpense.html');
@@ -8,14 +9,13 @@ exports.addExpense = (req,res,next) =>{
     
 }
 
-
 exports.postExpense = async (req,res,next) =>{
     const expense = req.body.expense;
     const category = req.body.category;
     const description = req.body.description;
-    const userId = req.body.userId;
+    const id = req.user.userId;
     try{
-        const hasDataStored = await ExpenseModel.create({expense,category,description,userId});
+        const hasDataStored = await ExpenseModel.create({expense,category,description, userId:id});
         if(hasDataStored){
             return res.status(201).json({success:"Expense Data has been created",expenseId: hasDataStored.id});
         }
@@ -26,8 +26,10 @@ exports.postExpense = async (req,res,next) =>{
 
 exports.getExpenses = async (req, res, next) => {
     try {
-        const expenses = await ExpenseModel.findAll();
+        const id = req.user.userId;
+        const expenses = await ExpenseModel.findAll({where : {userId : id}});
         return res.status(200).json({ expenses });
+    
     } catch (error) {
         console.error('Error fetching expenses:', error);
         return res.status(500).json({ error: 'Internal server error' });

@@ -73,7 +73,6 @@ exports.userLogIn = async (req, res, next) => {
             return res.status(401).json({ error: "user not found in bcrypt" });
         }
         else {
-
             bcrypt.compare(password, user.password, (err, result) => {
                 if (result) {
                     res.status(200).json({ message: "successfully found the password in bcrypt", token: generateAccessToken(user.id)});
@@ -84,8 +83,6 @@ exports.userLogIn = async (req, res, next) => {
             });
         }
     } catch (error) {
-
-        console.log('................................................................');
         console.log(error);
         return res.status(500).json({error:"User Not Found"});
     }

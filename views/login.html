@@ -51,8 +51,6 @@
                     EmptyNameField.value = "" ; //field gets empty
                     EmptyEmailField.value = "" ; //field gets empty
                     EmptyPasswordField.value = "" ; //field gets empty
-                    
-                    const id = responseFromPost.data.id;
                     localStorage.setItem('token',responseFromPost.data.token); //storing token in local storage
                     window.location.href = `/expense/addExpense`;
                     

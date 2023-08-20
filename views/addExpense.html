@@ -29,23 +29,17 @@
 
     </div>
     <script>
-
-        // const urlParams = new URLSearchParams(window.location.search); //function to fetch the value from url 
-        // const id = urlParams.get('id');
-        // console.log("------------------------------",id);
-
-        //will be envoked by onclick from form
+        const token = localStorage.getItem('token');
         function addNewExpenses(e) {
+            
             e.preventDefault();
             const expenseDetails = {
                 expense: e.target.expense.value,
                 description: e.target.description.value,
                 category: e.target.category.value,
             }
-            console.log(expenseDetails);//checking the object of details
-
             //sending post call to store details in database
-            axios.post('http://localhost:3000/expense/addExpense', expenseDetails).then((response) => {
+            axios.post('http://localhost:3000/expense/addExpense',expenseDetails, { headers: {"Authorization":token} }).then((response) => {
                 if (response.status === 201) {
                     fetchDataFromDatabase(); //fetching the data from database (retrieving).
                 } else {
@@ -53,11 +47,9 @@
                 }
             });
         };
-
-
+        
         function fetchDataFromDatabase() { //function to get/fetch data from database
-            const token = localStorage.getItem('token');
-            axios.get('http://localhost:3000/expense/getExpenses',{headers: {"Authorization":token}}).then((response) => {
+            axios.get('http://localhost:3000/expense/getExpenses',{ headers: {"Authorization":token}}).then((response) => {
                 showDataFromDatabase(response.data.expenses); //sending to function to display the data, check controller - how json is sending data to html
             }).catch(err => console.log(err));
         }
