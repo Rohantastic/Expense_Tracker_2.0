@@ -24,7 +24,8 @@ const User = database.define('user',{
     password:{
         type: DataTypes.STRING,
         allowNull: false
-    }
+    },
+    ispremiumuser: DataTypes.BOOLEAN
 },{
     timestamps:false
 });
