@@ -15,6 +15,6 @@ route.post('/addExpense',authentication.authenticate,ExpenseController.postExpen
 route.get('/getExpenses', authentication.authenticate ,ExpenseController.getExpenses);
 
 //deleting the expense through id
-route.delete('/deleteExpense/:id',ExpenseController.deleteExpense);
+route.delete('/deleteExpense/:id',authentication.authenticate, ExpenseController.deleteExpense);
 
 module.exports = route;

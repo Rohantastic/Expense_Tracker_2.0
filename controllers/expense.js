@@ -21,7 +21,7 @@ exports.postExpense = async (req,res,next) =>{
         }
     }catch(err){
         console.log(err);
-    }
+    }  
 }
 
 exports.getExpenses = async (req, res, next) => {
@@ -38,13 +38,16 @@ exports.getExpenses = async (req, res, next) => {
 
 exports.deleteExpense = async (req,res,next) =>{
     const id = req.params.id;
+    const tokenId = req.user.userId;
     try{
-        const hasDeleted = await ExpenseModel.destroy({where:{id:id}});
+        const hasDeleted = await ExpenseModel.destroy({where:{id:id, userId: tokenId}});
         if(hasDeleted){
             return res.status(204).json({success:true});
+        }else{
+            return res.status(401).json({error:"User is not authorized to delete the expense"});
         }
     }catch(err){
         console.log(err);
         res.status(500).json({error:"Error in delete Expense"});
     }
-}
+} 

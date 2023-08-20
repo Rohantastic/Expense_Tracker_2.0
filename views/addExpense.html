@@ -24,7 +24,7 @@
         <button>Add</button>
     </form>
     <hr>
-
+    <h1 id="nameOfUser"></h1>
     <div id="manifest">
 
     </div>
@@ -58,16 +58,19 @@
             const manifest = document.getElementById('manifest');
             manifest.innerHTML = '';
             expense.forEach((element) => {
-                let string = `<li> ID: ${element.id} Expense: ${element.expense} Category: ${element.category} Description: ${element.description} userID: ${element.userId} <button onclick="deleteExpense(${element.id})"> Delete </button> </li>`;
+                let string = `<li> Expense: ${element.expense} || Category: ${element.category} || Description: ${element.description} || <button onclick="deleteExpense(${element.id})"> Delete </button> </li>`;
                 manifest.innerHTML += string;
             });
         }
 
         async function deleteExpense(id) {
-            const response = await axios.delete(`http://localhost:3000/expense/deleteExpense/${id}`);
+            const response = await axios.delete(`http://localhost:3000/expense/deleteExpense/${id}`,{ headers: {"Authorization":token}});
             if (response.status === 204) {
                 fetchDataFromDatabase();
                 console.log("Deleted");
+            }else{
+                const errorDiv = document.getElementsByClassName('errorDiv');
+                errorDiv.innerHTML = ` <p style="color:red;"> Error Deleting, User UnAuthorized!! </p> `;
             }
         }
 

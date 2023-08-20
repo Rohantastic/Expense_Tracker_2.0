@@ -56,23 +56,11 @@
                     EmptyNameField.value = "" ; //field gets empty
                     EmptyEmailField.value = "" ; //field gets empty
                     EmptyPasswordField.value = "" ; //field gets empty
-                } else if (response.status === 401) {
-                    const manifest = document.getElementById('manifest');
-                    manifest.innerHTML = `<p>User already exists</p>`;
-                    EmptyNameField.value = "" ; //field gets empty
-                    EmptyEmailField.value = "" ; //field gets empty
-                    EmptyPasswordField.value = "" ; //field gets empty
-                } else if(response.status === 405) {
-                    const manifest = document.getElementById('manifest');
-                    manifest.innerHTML = `<p>: Input field is empty ${response.statusText}</p>`;
-                    EmptyNameField.value = "" ; //field gets empty
-                    EmptyEmailField.value = "" ; //field gets empty
-                    EmptyPasswordField.value = "" ; //field gets empty
                 }
             } catch (err) {
                 console.log(err);
                 const manifest = document.getElementById('manifest');
-                manifest.innerHTML = `<p>Error: ${err.message}</p>`;
+                manifest.innerHTML = `<p>Error: ${err.message}</p><span style="color:red;"> User Already Exists </span> `;
                 EmptyNameField.value = "" ; //field gets empty
                 EmptyEmailField.value = "" ; //field gets empty
                 EmptyPasswordField.value = "" ; //field gets empty
