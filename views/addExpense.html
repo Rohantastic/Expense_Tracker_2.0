@@ -26,6 +26,7 @@
         <button>Add</button>
     </form>
     <button id="razorPayButton">Premium</button>
+    <p id="premiumUserMessage"></p>
     <hr>
     <h1 id="nameOfUser"></h1>
     <div id="manifest">
@@ -93,6 +94,9 @@
                     },{headers : {"Authorization": token}});
 
                     alert("You are a premium user now");
+                    document.getElementById('razorPayButton').style.visibility = "hidden";
+                    const premiumUserMessage = document.getElementById('premiumUserMessage');
+                    premiumUserMessage.innerHTML = `<p style="color:gold;"> Premium User </p>`;
                 },
                 
             };

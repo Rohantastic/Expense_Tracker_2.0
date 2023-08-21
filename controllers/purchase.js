@@ -16,7 +16,7 @@ exports.purchasePremium = (req, res, next) => {
             //const response = await req.user.createOrder({ orderid: order.id, status: 'PENDING' });
             const response = await Order.create({orderid: order.id, status: 'PENDING', userId: req.user.userId});
             if (response) {
-                return res.status(201).json({ order, key_id: rzp.key_id });
+                return res.status(201).json({ order, key_id: rzp.key_id,});
             }
         });
     } catch (err) {
@@ -48,7 +48,7 @@ exports.updateTransactionStatus = async (req, res, next) => {
         // Wait for both updates to complete
         await Promise.all(promises);
 
-        return res.status(202).json({ success: true, message: "Transaction Successful" });
+        return res.status(202).json({ success: true, message: "Transaction Successful", ispremiumuser:true });
 
     } catch (err) {
         console.log(err);
