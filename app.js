@@ -3,6 +3,7 @@ const app = express();
 const UserRoute = require('./routes/User');
 const ExpenseRoute = require('./routes/expense');
 const PurchaseRoute = require('./routes/purchase');
+const PremiumRoute = require('./routes/premium');
 const bodyParser = require('body-parser');
 const sequelize = require('./config/database');
 const User = require('./models/User');
@@ -19,6 +20,7 @@ app.use(bodyParser.json());
 app.use('/user', UserRoute);
 app.use('/expense', ExpenseRoute);
 app.use('/purchase',PurchaseRoute);
+app.use('/premium',PremiumRoute);
 
 
 //database relations

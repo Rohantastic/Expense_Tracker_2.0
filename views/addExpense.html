@@ -28,6 +28,7 @@
         </select>
         <button>Add</button>
     </form>
+    <div id="message"></div>
     <button id="razorPayButton">Buy Premium</button>
     <p id="premiumUserMessage"></p>
     <hr>
@@ -35,8 +36,10 @@
     <div id="manifest">
 
     </div>
+    <div id="LeaderBoardText"></div>
+    <ul id="leaderboard"></ul>
     <script>
-        
+
         var token = localStorage.getItem('token');
 
 
@@ -50,37 +53,63 @@
             return JSON.parse(jsonPayload);
         }
 
-        
+
 
 
         document.addEventListener('DOMContentLoaded', async () => {
             try {
 
                 token = localStorage.getItem('token');
-                
+
                 const decodedToken = parseJwt(token);
-                
+
 
                 const isTrue = decodedToken.ispremiumuser;
-                
-                if (isTrue===true) {
+
+                if (isTrue === true) {
                     localStorage.setItem('isPremiumUser', 'true');
-                }else{
+                } else {
                     localStorage.setItem('isPremiumUser', 'false');
                 }
-                
+
                 const isPremiumUser = localStorage.getItem('isPremiumUser');
 
                 if (isPremiumUser === 'true') {
                     document.getElementById('premiumUserMessage').innerHTML = '<p style="color: gold;">Premium User</p>';
                     document.getElementById('razorPayButton').style.display = 'none';
+                    showLeaderboard();
+
+
                 }
             } catch (error) {
                 console.error('Error while checking premium status:', error);
             }
         });
 
-        
+
+        function showLeaderboard() {
+            const inputElement = document.createElement("input")
+            inputElement.type = "button"
+            inputElement.value = 'Show Leaderboard'
+            inputElement.onclick = async () => {
+                const token = localStorage.getItem('token')
+                const userLeaderBoardArray = await axios.get('http://localhost:3000/premium/leaderboard', { headers: { "Authorization": token } })
+                //console.log(userLeaderBoardArray)
+
+                var leaderboardElem = document.getElementById('leaderboard')
+                leaderboardElem.innerHTML = '<h1> Leader Board </h1>';
+                //leaderboardElem.innerHTML += '<h1> Leader Board </<h1>'
+                userLeaderBoardArray.data.forEach((userDetails) => {
+                    leaderboardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.ExpenseAmount || 0} </li>`
+                })
+            }
+            const messageElement = document.getElementById("message");
+            messageElement.innerHTML = '';
+            messageElement.appendChild(inputElement);
+
+        }
+
+
 
 
         function addNewExpenses(e) {
@@ -95,6 +124,7 @@
             axios.post('http://localhost:3000/expense/addExpense', expenseDetails, { headers: { "Authorization": token } }).then((response) => {
                 if (response.status === 201) {
                     fetchDataFromDatabase(); //fetching the data from database (retrieving).
+                    
                 } else {
                     console.log("err");
                 }
@@ -145,10 +175,10 @@
                     alert("You are a premium user now");
                     document.getElementById('premiumUserMessage').innerHTML = `<p style="color:gold;">Premium User</p>`;
                     document.getElementById('razorPayButton').style.visibility = 'hidden';
+                    
 
-                    
                     localStorage.setItem('token', responseOfAxiosPost.data.token)
-                    
+
 
                 },
 
