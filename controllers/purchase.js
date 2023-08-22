@@ -1,6 +1,14 @@
 const Razorpay = require('razorpay');
 const Order = require('../models/Orders');
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+//const userController = require('./User'); // Import userController to access generateAccessToken function
+
+
+function generateAccessToken(id,ispremiumuser,name){
+    return jwt.sign({userId:id, ispremiumuser:ispremiumuser,name:name},"b6b5742d7d780baf8e42d5c3e41e6e3a25dcf8df05b26c3d6e21c03f531e4928");//secret key
+}
+
 
 exports.purchasePremium = (req, res, next) => {
     try {
@@ -13,17 +21,16 @@ exports.purchasePremium = (req, res, next) => {
             if (err) {
                 throw new Error(err);
             }
-            //const response = await req.user.createOrder({ orderid: order.id, status: 'PENDING' });
-            const response = await Order.create({orderid: order.id, status: 'PENDING', userId: req.user.userId});
+            const response = await Order.create({ orderid: order.id, status: 'PENDING', userId: req.user.userId });
             if (response) {
-                return res.status(201).json({ order, key_id: rzp.key_id,});
+                return res.status(201).json({ order, key_id: rzp.key_id });
             }
         });
     } catch (err) {
         console.log('Error in purchasePremium controller');
+        res.status(500).json({ error: err, message: "Something went wrong" });
     }
 };
-
 
 exports.updateTransactionStatus = async (req, res, next) => {
     try {
@@ -48,13 +55,16 @@ exports.updateTransactionStatus = async (req, res, next) => {
         // Wait for both updates to complete
         await Promise.all(promises);
 
-        return res.status(202).json({ success: true, message: "Transaction Successful", ispremiumuser:true });
+        // Generate an updated access token
+       const updatedToken = generateAccessToken(user.id,user.ispremiumuser,user.name)
+        return res.status(202).json({ success: true, message: "Transaction Successful", ispremiumuser: true, token: updatedToken });
 
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: err, message: "Something went wrong in updateTransaction" });
     }
 };
+
 
 
 // exports.updateTransactionStatus = async (req, res, next) => {

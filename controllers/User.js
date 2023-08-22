@@ -4,8 +4,8 @@ const UserModel =  require('../models/User');
 const jwt = require('jsonwebtoken');
 
 
-function generateAccessToken(id){
-    return jwt.sign({userId:id},"b6b5742d7d780baf8e42d5c3e41e6e3a25dcf8df05b26c3d6e21c03f531e4928");//secret key
+function generateAccessToken(id,ispremiumuser,name){
+    return jwt.sign({userId:id, ispremiumuser:ispremiumuser,name:name},"b6b5742d7d780baf8e42d5c3e41e6e3a25dcf8df05b26c3d6e21c03f531e4928");//secret key
 }
 
 exports.signUpCredentials = (req, res) => {
@@ -75,7 +75,7 @@ exports.userLogIn = async (req, res, next) => {
         else {
             bcrypt.compare(password, user.password, (err, result) => {
                 if (result) {
-                    res.status(200).json({ message: "successfully found the password in bcrypt", token: generateAccessToken(user.id)});
+                    res.status(200).json({ message: "successfully found the password in bcrypt", token: generateAccessToken(user.id,user.ispremiumuser,user.name)});
                 } 
                 else {
                     res.status(401).json({ error: "password doesnt match" });

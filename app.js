@@ -9,7 +9,7 @@ const User = require('./models/User');
 const Expense = require('./models/expense');
 const Order = require('./models/Orders');
 
-app.use(express.static('public'));
+app.use(express.static('views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
