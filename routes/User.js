@@ -18,4 +18,14 @@ route.post('/loggedin',UserController.userLogIn)
 
 
 
+
+//get forgot password page
+route.get('/password/forgotpassword',UserController.forgotPassword);
+
+// verify the user to get password over email
+route.post('/password/verification',UserController.forgotPasswordVerification);
+
+route.post('/password/resetpassword',UserController.resettingPassword);
+
+
 module.exports = route;

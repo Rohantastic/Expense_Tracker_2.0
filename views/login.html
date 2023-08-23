@@ -18,6 +18,7 @@
             <label for="password">Enter Password</label>
             <input type="password" name="password" id="password" required>
             <button>Log in</button>
+            <button id="forgotPassword">Forgot Password</button>
         </form>
         <a href="/user/signup">Sign up</a>
         <hr>
@@ -68,6 +69,12 @@
                 EmptyPasswordField.value = "" ; //field gets empty
             }
         });
+
+        const forgotPassword = document.getElementById('forgotPassword');
+        forgotPassword.addEventListener('click',async ()=>{
+            window.location.href='/user/password/forgotpassword'
+        });
+
     </script>
 </body>
 
