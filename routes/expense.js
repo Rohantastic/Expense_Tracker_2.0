@@ -17,4 +17,7 @@ route.get('/getExpenses', authentication.authenticate ,ExpenseController.getExpe
 //deleting the expense through id
 route.delete('/deleteExpense/:id',authentication.authenticate, ExpenseController.deleteExpense);
 
+//downloading the expense file from amazon aws s3 storage
+route.get('/download',authentication.authenticate, ExpenseController.downloadExpense);
+
 module.exports = route;

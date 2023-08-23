@@ -31,10 +31,12 @@
     <div id="message"></div>
     <button id="razorPayButton">Buy Premium</button>
     <button id="downloadExpenseButton" style="visibility: hidden;">Download</button>
+    <button id="downloadHistory" style="visibility: hidden;">Download History</button>
     <p id="premiumUserMessage"></p>
     <hr>
     <h1 id="nameOfUser"></h1>
     <div id="manifest"></div>
+    <ul id="downloadHistoryList"></ul>
     <div id="LeaderBoardText"></div>
     <ul id="leaderboard"></ul>
     <script>
@@ -78,6 +80,7 @@
                     document.getElementById('razorPayButton').style.display = 'none';
                     showLeaderboard();
                     download(); //will only be visible for premium user
+                    downloadHistory();//show History of download
 
                 }
             } catch (error) {
@@ -109,14 +112,58 @@
 
 
         //download button to download expenses file
-        function download(){
+        function download() {
             const downloadButton = document.getElementById('downloadExpenseButton');
-            downloadButton.style.visibility='visible';
-            downloadButton.addEventListener('click',async (e)=>{
+            downloadButton.style.visibility = 'visible';
+            downloadButton.addEventListener('click', async (e) => {
                 e.preventDefault();
+                axios.get('http://localhost:3000/expense/download', { headers: { "Authorization": token } }).then((response) => {
+                    if (response.status === 200) {
+                        if (response.data.fileURL) { // Check if fileURL is present in the response
+                            var a = document.createElement("a");
+                            a.href = response.data.fileURL;
+                            a.download = 'myexpense.csv';
+                            a.click();
+                        } else {
+                            throw new Error("File URL not found in response");
+                        }
+                    } else {
+                        throw new Error(response.statusText);
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                });
 
             });
         }
+
+        function downloadHistory() {
+            const downloadButton = document.getElementById('downloadHistory');
+            downloadButton.style.visibility = 'visible';
+            downloadButton.addEventListener('click', async (e) => {
+                e.preventDefault();
+                axios.get('http://localhost:3000/expense/download', { headers: { "Authorization": token } }).then((response) => {
+                    if (response.status === 200) {
+                        if (response.data.fileHistory && Array.isArray(response.data.fileHistory)) {
+                            const downloadHistoryList = document.getElementById('downloadHistoryList');
+
+                            response.data.fileHistory.forEach(fileItem => {
+                                const listItem = document.createElement('li');
+                                listItem.textContent = fileItem.fileName; // Adjust this based on your data structure
+                                downloadHistoryList.appendChild(listItem);
+                            });
+                        } else {
+                            throw new Error("File history not found in response");
+                        }
+                    } else {
+                        throw new Error(response.statusText);
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                });
+            });
+        }
+
 
 
 
@@ -133,7 +180,7 @@
             axios.post('http://localhost:3000/expense/addExpense', expenseDetails, { headers: { "Authorization": token } }).then((response) => {
                 if (response.status === 201) {
                     fetchDataFromDatabase(); //fetching the data from database (retrieving).
-                    
+
                 } else {
                     console.log("err");
                 }
@@ -184,7 +231,7 @@
                     alert("You are a premium user now");
                     document.getElementById('premiumUserMessage').innerHTML = `<p style="color:gold;">Premium User</p>`;
                     document.getElementById('razorPayButton').style.visibility = 'hidden';
-                    
+
 
                     localStorage.setItem('token', responseOfAxiosPost.data.token)
 

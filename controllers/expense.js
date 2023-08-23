@@ -1,4 +1,5 @@
 const path = require('path');
+const AWS = require('aws-sdk');
 const ExpenseModel = require('../models/expense');
 const User = require('../models/User');
 const Sequelize = require('sequelize');
@@ -58,4 +59,51 @@ exports.deleteExpense = async (req, res, next) => {
         console.log(err);
         res.status(500).json({ error: "Error in delete Expense" });
     }
-}; 
+};
+
+
+async function uploadToS3(data, filename) {
+    const BUCKET_NAME = 'generatedexpensedownload';
+    const IAM_USER_KEY = 'AKIA2B3LMHXNWTLGC5OR';
+    const IAM_USER_SECRET = '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';
+
+    const s3bucket = new AWS.S3({
+        accessKeyId: IAM_USER_KEY,
+        secretAccessKey: IAM_USER_SECRET,
+        Bucket: BUCKET_NAME
+    });
+
+    const params = {
+        Bucket: BUCKET_NAME,
+        Key: filename,
+        Body: data,
+        ACL: 'public-read'
+    };
+
+    try {
+        const s3response = await s3bucket.upload(params).promise();
+        console.log('success', s3response);
+        return s3response.Location;
+    } catch (err) {
+        console.log(err);
+    }
+
+}
+exports.downloadExpense = async (req, res, next) => {
+    const id = req.user.userId;
+    try {
+        const expenses = await ExpenseModel.findAll({ where: { userId: id } });
+        if (expenses) {
+            const stringifiedExpenses = JSON.stringify(expenses);
+            const filename = `Expense${id}/${new Date()}.txt`;
+
+            const object = [];
+            object.push(filename);
+            const fileURL = await uploadToS3(stringifiedExpenses, filename);
+            return res.status(200).json({ fileURL, success: true, fileHistory:object });
+        }
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: "error in downloading" });
+    }
+};
