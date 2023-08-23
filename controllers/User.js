@@ -2,8 +2,10 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const dotenv = require('dotenv').config();
 const UserModel = require('../models/User');
+const ForgotPasswordModel = require('../models/ForgotPasswordRequests');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const uuid = require('uuid');
 
 
 
@@ -126,6 +128,9 @@ exports.resettingPassword = async (req, res, next) => {
 
     const emailOfUser = req.body.email;
     try {
+
+        const uid = uuid.v4();
+
         var transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 587,
@@ -136,11 +141,31 @@ exports.resettingPassword = async (req, res, next) => {
                 pass: 'sevclawiruwcteai'
             }
         });
+
+        
+        
+        try{
+            const responseOfForgotPasswordModel = await ForgotPasswordModel.create({id:uid,active:true});
+            if(responseOfForgotPasswordModel){
+                UserModel.findOne({where:{email:emailOfUser}}).then(async (response)=>{
+                    try{
+                        await ForgotPasswordModel.update({userId:response.id},{where:{id:uid}});
+                    }catch(err){
+                        console.log(err);
+                    }
+                });
+            }
+        }catch(err){
+            console.log(err);
+        }
+
+
         var mailOptions = {
             from: 'rohan.expensetracker@gmail.com',
             to: emailOfUser,
-            subject: "OTP For Login",
-            text: `Your OTP is ${emailOfUser} to login`
+            subject: "Password Reset Link of Expense Tracker",
+            text: `Your OTP for ${emailOfUser}:`,
+            html:`<a href="http://localhost:3000/user/password/resetpasswordform/${uid}">Reset password</a>`
         };
 
         transporter.sendMail(mailOptions, (err, info) => {
@@ -155,5 +180,64 @@ exports.resettingPassword = async (req, res, next) => {
         console.log(err);
     }
 };
+
+
+exports.resetPasswordForm = async (req,res,next)=>{
+    const id = req.params.id;
+    const response = await ForgotPasswordModel.findOne({where:{id:id}});
+    if(response){
+        const updationOfactive = await ForgotPasswordModel.update({active:false},{where:{id:id}});
+        if(updationOfactive){
+            res.status(200).send(`
+                                <html>
+                                    <script>
+                                     console.log("Passing the form to updatePassword");
+                                    </script>
+
+                                    <form action="/user/password/updatepassword/${id}" method="post">
+                                        <label for="newpassword">Enter New password</label>
+                                        <input name="newpassword" type="password" required></input>
+                                        <button>reset password</button>
+                                    </form>
+                                    
+                                </html>`);
+        }
+    } 
+};
+
+
+exports.updatePassword = async (req,res,next)=>{
+    const newpassword = req.body.newpassword;
+    const id = req.params.id;
+    try{
+        const responseOfUpdatePassword = await ForgotPasswordModel.findOne({where: {id:id}});
+        console.log('>>>>>responseOfUpdatePassword id: ', responseOfUpdatePassword);
+        if(responseOfUpdatePassword){
+            const ResponseOfUserModel = await UserModel.findOne({ where : { id:responseOfUpdatePassword.userId }});
+            const saltRounds = 10;
+            bcrypt.genSalt(saltRounds, async (err,salt)=>{
+                if(err){
+                    console.log(err);
+                    throw new Error(err);
+                }else{
+                    bcrypt.hash(newpassword,salt,async (err,hash)=>{
+                        if(err){
+                            console.log(err);
+                        }else{
+                            const updatingPassword = await UserModel.update({password: hash},{where:{id:responseOfUpdatePassword.userId}});
+                            if(updatingPassword){
+                                return res.status(201).json({message: 'Successfuly update the new password'})
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    }catch(err){
+        console.log(err);
+    }
+}
+
+
 
 

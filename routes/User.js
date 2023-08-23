@@ -27,5 +27,9 @@ route.post('/password/verification',UserController.forgotPasswordVerification);
 
 route.post('/password/resetpassword',UserController.resettingPassword);
 
+route.get('/password/resetpasswordform/:id',UserController.resetPasswordForm);
+
+route.post('/password/updatepassword/:id', UserController.updatePassword);
+
 
 module.exports = route;

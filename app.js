@@ -9,6 +9,7 @@ const sequelize = require('./config/database');
 const User = require('./models/User');
 const Expense = require('./models/expense');
 const Order = require('./models/Orders');
+const PasswordRequest = require('./models/ForgotPasswordRequests');
 
 app.use(express.static('views'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -30,9 +31,12 @@ Expense.belongsTo(User);
 User.hasMany(Order);
 Order.belongsTo(User);
 
+User.hasMany(PasswordRequest);
+PasswordRequest.belongsTo(User);
+
 
 // Synchronizing the tables with the database
-sequelize.sync({ alter: true })
+sequelize.sync()
     .then(() => {
         console.log('Database synced successfully');
     })
