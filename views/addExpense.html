@@ -30,12 +30,11 @@
     </form>
     <div id="message"></div>
     <button id="razorPayButton">Buy Premium</button>
+    <button id="downloadExpenseButton" style="visibility: hidden;">Download</button>
     <p id="premiumUserMessage"></p>
     <hr>
     <h1 id="nameOfUser"></h1>
-    <div id="manifest">
-
-    </div>
+    <div id="manifest"></div>
     <div id="LeaderBoardText"></div>
     <ul id="leaderboard"></ul>
     <script>
@@ -78,7 +77,7 @@
                     document.getElementById('premiumUserMessage').innerHTML = '<p style="color: gold;">Premium User</p>';
                     document.getElementById('razorPayButton').style.display = 'none';
                     showLeaderboard();
-
+                    download(); //will only be visible for premium user
 
                 }
             } catch (error) {
@@ -106,7 +105,17 @@
             const messageElement = document.getElementById("message");
             messageElement.innerHTML = '';
             messageElement.appendChild(inputElement);
+        };
 
+
+        //download button to download expenses file
+        function download(){
+            const downloadButton = document.getElementById('downloadExpenseButton');
+            downloadButton.style.visibility='visible';
+            downloadButton.addEventListener('click',async (e)=>{
+                e.preventDefault();
+
+            });
         }
 
 

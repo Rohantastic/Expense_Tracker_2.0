@@ -124,6 +124,7 @@ exports.forgotPasswordVerification = async (req, res, next) => {
 
 };
 
+//calling the smtp to send mail to the user for password reset link
 exports.resettingPassword = async (req, res, next) => {
 
     const emailOfUser = req.body.email;
