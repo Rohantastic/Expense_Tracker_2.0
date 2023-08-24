@@ -10,7 +10,7 @@ const uuid = require('uuid');
 
 
 function generateAccessToken(id, ispremiumuser, name) {
-    return jwt.sign({ userId: id, ispremiumuser: ispremiumuser, name: name }, "b6b5742d7d780baf8e42d5c3e41e6e3a25dcf8df05b26c3d6e21c03f531e4928");//secret key
+    return jwt.sign({ userId: id, ispremiumuser: ispremiumuser, name: name }, process.env.JWT_TOKEN );//secret key
 }
 
 exports.signUpCredentials = (req, res) => {
@@ -138,8 +138,8 @@ exports.resettingPassword = async (req, res, next) => {
             secure: false,
             requireTLS: true,
             auth: {
-                user: 'rohan.expensetracker@gmail.com',
-                pass: 'sevclawiruwcteai'
+                user: process.env.NODEMAILER_USER_EMAIL,
+                pass: NODEMAILER_USER_PASSWORD
             }
         });
 

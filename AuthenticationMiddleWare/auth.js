@@ -6,7 +6,7 @@ const User = require('../models/User');
 exports.authenticate = async (req,res,next)=>{
     try{
         const token = req.header('authorization');
-        const userObject = jwt.verify(token,"b6b5742d7d780baf8e42d5c3e41e6e3a25dcf8df05b26c3d6e21c03f531e4928");
+        const userObject = jwt.verify(token,process.env.JWT_TOKEN);
         const user = await User.findByPk(userObject.userId);
         if(user){
             req.user = userObject;

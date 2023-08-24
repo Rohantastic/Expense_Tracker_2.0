@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 
 
 function generateAccessToken(id,ispremiumuser,name){
-    return jwt.sign({userId:id, ispremiumuser:ispremiumuser,name:name},"b6b5742d7d780baf8e42d5c3e41e6e3a25dcf8df05b26c3d6e21c03f531e4928");//secret key
+    return jwt.sign({userId:id, ispremiumuser:ispremiumuser,name:name},process.env.JWT_TOKEN);//secret key
 }
 
 
@@ -64,25 +64,3 @@ exports.updateTransactionStatus = async (req, res, next) => {
         res.status(500).json({ error: err, message: "Something went wrong in updateTransaction" });
     }
 };
-
-
-
-// exports.updateTransactionStatus = async (req, res, next) => {
-//    try{
-//         const { payment_id, order_id } = req.body;
-//         //const order = await Order.findOne({where: order_id});
-//         const order = await Order.findOne({ where: { orderid: order_id } });
-//         const promise1 =  order.update({paymentid: payment_id, status: 'SUCCESSFUL'});
-//         const promise2 =  req.user.update({ispremiumuser: true});
-//         Promise.all([promise1,promise2]).then(()=>{
-//             return res.status(202).json({success: true, message:"Transaction Successfull"});
-//         }).catch((err)=>{
-//             throw new Error(err);
-//         });
-        
-        
-//    }catch(err){
-//         console.log(err);
-//         res.status(403).json({error: err, message: "something went wrong in updateTransaction"});
-//    }
-// };

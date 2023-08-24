@@ -81,9 +81,9 @@ exports.deleteExpense = async (req, res, next) => {
 
 //amazon S3 function to files to S3 Storage
 async function uploadToS3(data, filename) { //data has all the expenses
-    const BUCKET_NAME = 'generatedexpensedownload';
-    const IAM_USER_KEY = 'AKIA2B3LMHXNWTLGC5OR';
-    const IAM_USER_SECRET = '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';
+    const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
+    const IAM_USER_KEY = process.env.IAM_USER_KEY;
+    const IAM_USER_SECRET = process.env.IAM_USER_SECRET;
 
     const s3bucket = new AWS.S3({
         accessKeyId: IAM_USER_KEY,
