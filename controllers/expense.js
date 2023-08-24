@@ -7,9 +7,7 @@ const sequelize = require('../config/database');
 
 exports.addExpense = (req, res, next) => {
     const string = path.join(__dirname, '../', '/views/addExpense.html');
-    console.log('get controller');
     res.sendFile(string);
-
 };
 
 exports.postExpense = async (req, res, next) => {
@@ -30,18 +28,39 @@ exports.postExpense = async (req, res, next) => {
     }
 };
 
+const ITEMS_PER_PAGE = 4; //only 4 items will be shown on the screen at a time
+
+//getExpense to Display expenses on screen using pagination
 exports.getExpenses = async (req, res, next) => {
+    const page = parseInt(req.query.page) || 1;
+
     try {
         const id = req.user.userId;
-        const expenses = await ExpenseModel.findAll({ where: { userId: id } });
-        return res.status(200).json({ expenses });
-
-    } catch (error) {
-        console.error('Error fetching expenses:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        const totalItems = await ExpenseModel.count({ where: { userId: id } });
+        const offset = (page - 1) * ITEMS_PER_PAGE;
+        const expenses = await ExpenseModel.findAll({
+            where: { userId: id },
+            offset: offset,
+            limit: ITEMS_PER_PAGE
+        });
+        res.json({
+            expenses: expenses,
+            currentPage: page,
+            hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+            nextPage: page + 1,
+            hasPreviousPage: page > 1,
+            previousPage: page - 1,
+            lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE)
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "An error occurred" });
     }
 };
 
+
+
+//function to delete the expense from table
 exports.deleteExpense = async (req, res, next) => {
     const t = await sequelize.transaction();
     const id = req.params.id;
@@ -61,8 +80,8 @@ exports.deleteExpense = async (req, res, next) => {
     }
 };
 
-
-async function uploadToS3(data, filename) {
+//amazon S3 function to files to S3 Storage
+async function uploadToS3(data, filename) { //data has all the expenses
     const BUCKET_NAME = 'generatedexpensedownload';
     const IAM_USER_KEY = 'AKIA2B3LMHXNWTLGC5OR';
     const IAM_USER_SECRET = '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';
@@ -77,30 +96,30 @@ async function uploadToS3(data, filename) {
         Bucket: BUCKET_NAME,
         Key: filename,
         Body: data,
-        ACL: 'public-read'
+        ACL: 'public-read' //so that it should be accessible to all
     };
 
     try {
-        const s3response = await s3bucket.upload(params).promise();
-        console.log('success', s3response);
-        return s3response.Location;
+        const s3response = await s3bucket.upload(params).promise(); //it returns promise, first we uploading and then returning promise
+        console.log('success', s3response); //printing if we get successful response
+        return s3response.Location; //getting the link returning it
     } catch (err) {
-        console.log(err);
+        console.log(err); //else get the error
     }
 
 }
 exports.downloadExpense = async (req, res, next) => {
-    const id = req.user.userId;
+    const id = req.user.userId; //fetching id from auth middleware
     try {
-        const expenses = await ExpenseModel.findAll({ where: { userId: id } });
+        const expenses = await ExpenseModel.findAll({ where: { userId: id } }); //finding all the expenses related to foreignkey userId
         if (expenses) {
-            const stringifiedExpenses = JSON.stringify(expenses);
-            const filename = `Expense${id}/${new Date()}.txt`;
+            const stringifiedExpenses = JSON.stringify(expenses); //converting to string 
+            const filename = `Expense${id}/${new Date()}.txt`; //to make every file distinct of each other
 
-            const object = [];
-            object.push(filename);
+            const object = []; //created array to show on screen, new button to view download history
+            object.push(filename); // pushing all the filenames, into array.
             const fileURL = await uploadToS3(stringifiedExpenses, filename);
-            return res.status(200).json({ fileURL, success: true, fileHistory:object });
+            return res.status(200).json({ fileURL, success: true, fileHistory: object }); //sending fileURL and object array to frontEnd via json
         }
     } catch (err) {
         console.log(err);

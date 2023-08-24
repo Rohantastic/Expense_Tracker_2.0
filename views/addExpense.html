@@ -36,6 +36,10 @@
     <hr>
     <h1 id="nameOfUser"></h1>
     <div id="manifest"></div>
+    <div id="pagination" style="position: fixed; bottom: 0; width: 100%; background-color: #f0f0f0; padding: 20px; text-align: center;">
+        
+    </div>
+    <h1 id="downloadHistoryListHeading"></h1>
     <ul id="downloadHistoryList"></ul>
     <div id="LeaderBoardText"></div>
     <ul id="leaderboard"></ul>
@@ -43,7 +47,7 @@
 
         var token = localStorage.getItem('token');
 
-
+        //function to decode token into an object
         function parseJwt(token) {
             var base64Url = token.split('.')[1];
             var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -56,7 +60,7 @@
 
 
 
-
+        //automatically gets called when screen content is loaded
         document.addEventListener('DOMContentLoaded', async () => {
             try {
 
@@ -89,6 +93,7 @@
         });
 
 
+        //function to show leaderBoard
         function showLeaderboard() {
             const inputElement = document.createElement("input")
             inputElement.type = "button"
@@ -142,6 +147,7 @@
             downloadButton.style.visibility = 'visible';
             downloadButton.addEventListener('click', async (e) => {
                 e.preventDefault();
+                const downloadHistoryListHeading = document.getElementById('downloadHistoryListHeading').innerHTML = `<li> Download History List </li>`
                 axios.get('http://localhost:3000/expense/download', { headers: { "Authorization": token } }).then((response) => {
                     if (response.status === 200) {
                         if (response.data.fileHistory && Array.isArray(response.data.fileHistory)) {
@@ -149,7 +155,7 @@
 
                             response.data.fileHistory.forEach(fileItem => {
                                 const listItem = document.createElement('li');
-                                listItem.textContent = fileItem.fileName; // Adjust this based on your data structure
+                                listItem.innerHTML = `${fileItem}`; 
                                 downloadHistoryList.appendChild(listItem);
                             });
                         } else {
@@ -179,7 +185,7 @@
             //sending post call to store details in database
             axios.post('http://localhost:3000/expense/addExpense', expenseDetails, { headers: { "Authorization": token } }).then((response) => {
                 if (response.status === 201) {
-                    fetchDataFromDatabase(); //fetching the data from database (retrieving).
+                    //fetchDataFromDatabase(); //fetching the data from database (retrieving).
 
                 } else {
                     console.log("err");
@@ -187,10 +193,38 @@
             });
         };
 
-        function fetchDataFromDatabase() { //function to get/fetch data from database
-            axios.get('http://localhost:3000/expense/getExpenses', { headers: { "Authorization": token } }).then((response) => {
+        function fetchDataFromDatabase(page) { //function to get/fetch data from database
+            var page = page || 1;
+            axios.get(`http://localhost:3000/expense/getExpenses?page=${page}`, { headers: { "Authorization": token } }).then((response) => {
+                
                 showDataFromDatabase(response.data.expenses); //sending to function to display the data, check controller - how json is sending data to html
+                showPagination(response.data);
             }).catch(err => console.log(err));
+        }
+
+
+        //pagination function to show buttons for pagination
+        function showPagination({currentPage,hasNextPage,nextPage,hasPreviousPage,previousPage,lastPage}){
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            if(hasPreviousPage){
+                const btn2 = document.createElement('button');
+                btn2.innerHTML = previousPage;
+                btn2.addEventListener('click',()=> fetchDataFromDatabase(previousPage));
+                pagination.appendChild(btn2);
+            }
+
+            const btn1 = document.createElement('button');
+            btn1.innerHTML = `<h3>${currentPage}</h3>`;
+            btn1.addEventListener('click',()=> fetchDataFromDatabase(currentPage));
+            pagination.appendChild(btn1);
+            
+            if(hasNextPage){
+                const btn3 = document.createElement('button');
+                btn3.innerHTML = nextPage;
+                btn3.addEventListener('click',()=>fetchDataFromDatabase(nextPage));
+                pagination.appendChild(btn3);
+            }
         }
 
         function showDataFromDatabase(expense) { //function to display data
@@ -202,6 +236,8 @@
             });
         }
 
+
+        //function to delete the expense from database
         async function deleteExpense(id) {
             const response = await axios.delete(`http://localhost:3000/expense/deleteExpense/${id}`, { headers: { "Authorization": token } });
             if (response.status === 204) {
