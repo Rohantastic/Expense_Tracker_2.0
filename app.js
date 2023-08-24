@@ -20,7 +20,7 @@ app.use(express.static('views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-
+//flag:a,  a means append
 const accessLogStream = fs.createWriteStream(path.join(__dirname,'access.log'),{flags:'a'});//creating a log files to view all console logs on a log file
 
 //routes
