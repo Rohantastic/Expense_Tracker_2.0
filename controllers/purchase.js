@@ -13,8 +13,8 @@ function generateAccessToken(id,ispremiumuser,name){
 exports.purchasePremium = (req, res, next) => {
     try {
         var rzp = new Razorpay({
-            key_id: "rzp_test_yG03WciVhl4Gc0",
-            key_secret: "QBZ7tIyw94KmLF5FDalICpUw"
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET
         });
         const amount = 2500;
         rzp.orders.create({ amount, currency: "INR" }, async (err, order) => {
