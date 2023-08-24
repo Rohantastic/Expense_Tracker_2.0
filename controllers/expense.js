@@ -28,12 +28,11 @@ exports.postExpense = async (req, res, next) => {
     }
 };
 
-const ITEMS_PER_PAGE = 4; //only 4 items will be shown on the screen at a time
+const ITEMS_PER_PAGE = 10; 
 
 //getExpense to Display expenses on screen using pagination
 exports.getExpenses = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
-
     try {
         const id = req.user.userId;
         const totalItems = await ExpenseModel.count({ where: { userId: id } });

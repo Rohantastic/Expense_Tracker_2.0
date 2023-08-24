@@ -36,9 +36,17 @@
     <hr>
     <h1 id="nameOfUser"></h1>
     <div id="manifest"></div>
-    <div id="pagination" style="position: fixed; bottom: 0; width: 100%; background-color: #f0f0f0; padding: 20px; text-align: center;">
-        
+    <div style="position: fixed; bottom: 0; width: 100%; background-color: #f0f0f0; padding: 20px; text-align: center;">
+        <div id="pagination"></div>
+        <select name="dynamicpagination" id="dynamicpagination"
+            style="position: fixed; bottom: 10px; right: 20px; background-color: #f0f0f0; padding: 10px;">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+        </select>
     </div>
+
     <h1 id="downloadHistoryListHeading"></h1>
     <ul id="downloadHistoryList"></ul>
     <div id="LeaderBoardText"></div>
@@ -142,6 +150,7 @@
             });
         }
 
+        //bonus task: to view download File History
         function downloadHistory() {
             const downloadButton = document.getElementById('downloadHistory');
             downloadButton.style.visibility = 'visible';
@@ -155,7 +164,7 @@
 
                             response.data.fileHistory.forEach(fileItem => {
                                 const listItem = document.createElement('li');
-                                listItem.innerHTML = `${fileItem}`; 
+                                listItem.innerHTML = `${fileItem}`;
                                 downloadHistoryList.appendChild(listItem);
                             });
                         } else {
@@ -170,17 +179,22 @@
             });
         }
 
-
-
-
-
         function addNewExpenses(e) {
 
             e.preventDefault();
+            var category = 'others'
+            if(e.target.category.value==='1'){
+                 category = 'fuel';
+            }else if(e.target.category.value==='2'){
+                 category = 'medicine';
+            }
+            else if(e.target.category.value==='3'){
+                 category = 'groceries';
+            }
             const expenseDetails = {
                 expense: e.target.expense.value,
                 description: e.target.description.value,
-                category: e.target.category.value,
+                category: category,
             }
             //sending post call to store details in database
             axios.post('http://localhost:3000/expense/addExpense', expenseDetails, { headers: { "Authorization": token } }).then((response) => {
@@ -194,9 +208,10 @@
         };
 
         function fetchDataFromDatabase(page) { //function to get/fetch data from database
+            const dynamicpagination = document.getElementById('dynamicpagination').value;
             var page = page || 1;
-            axios.get(`http://localhost:3000/expense/getExpenses?page=${page}`, { headers: { "Authorization": token } }).then((response) => {
-                
+            axios.get(`http://localhost:3000/expense/getExpenses?page=${page}`, { headers: { "Authorization": token }, params: { size: dynamicpagination } }).then((response) => {
+
                 showDataFromDatabase(response.data.expenses); //sending to function to display the data, check controller - how json is sending data to html
                 showPagination(response.data);
             }).catch(err => console.log(err));
@@ -204,25 +219,25 @@
 
 
         //pagination function to show buttons for pagination
-        function showPagination({currentPage,hasNextPage,nextPage,hasPreviousPage,previousPage,lastPage}){
+        function showPagination({ currentPage, hasNextPage, nextPage, hasPreviousPage, previousPage, lastPage }) {
             const pagination = document.getElementById('pagination');
             pagination.innerHTML = '';
-            if(hasPreviousPage){
+            if (hasPreviousPage) {
                 const btn2 = document.createElement('button');
                 btn2.innerHTML = previousPage;
-                btn2.addEventListener('click',()=> fetchDataFromDatabase(previousPage));
+                btn2.addEventListener('click', () => fetchDataFromDatabase(previousPage));
                 pagination.appendChild(btn2);
             }
 
             const btn1 = document.createElement('button');
             btn1.innerHTML = `<h3>${currentPage}</h3>`;
-            btn1.addEventListener('click',()=> fetchDataFromDatabase(currentPage));
+            btn1.addEventListener('click', () => fetchDataFromDatabase(currentPage));
             pagination.appendChild(btn1);
-            
-            if(hasNextPage){
+
+            if (hasNextPage) {
                 const btn3 = document.createElement('button');
                 btn3.innerHTML = nextPage;
-                btn3.addEventListener('click',()=>fetchDataFromDatabase(nextPage));
+                btn3.addEventListener('click', () => fetchDataFromDatabase(nextPage));
                 pagination.appendChild(btn3);
             }
         }
