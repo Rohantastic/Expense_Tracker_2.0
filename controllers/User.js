@@ -41,7 +41,7 @@ exports.postCredentials = async (req, res) => {
                         } else {
                             throw new Error("User cannot be created");
                         }
-                    });
+                    }); 
 
                 } catch (err) {
                     return res.status(500).json({ error: "error in signing up" });
@@ -65,7 +65,7 @@ exports.loginCredentials = (req, res, next) => {
 }
 
 
-//when user logs in
+//when user logs in to the login page
 exports.userLogIn = async (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
@@ -75,7 +75,7 @@ exports.userLogIn = async (req, res, next) => {
 
         const userEmail = user.email;
         if (userEmail !== email) {
-            return res.status(401).json({ error: "user not found in bcrypt" });
+            return res.status(401).json({ error: "user not found" });
         }
         else {
             bcrypt.compare(password, user.password, (err, result) => {
@@ -83,13 +83,13 @@ exports.userLogIn = async (req, res, next) => {
                     res.status(200).json({ message: "successfully found the password in bcrypt", token: generateAccessToken(user.id, user.ispremiumuser, user.name) });
                 }
                 else {
-                    res.status(401).json({ error: "password doesnt match" });
+                    res.status(401).json({ error: "password doesnt match", success:false });
                 }
             });
         }
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ error: "User Not Found" });
+        return res.status(500).json({ error: "User Not Found",  success:false });
     }
 };
 
@@ -139,7 +139,7 @@ exports.resettingPassword = async (req, res, next) => {
             requireTLS: true,
             auth: {
                 user: process.env.NODEMAILER_USER_EMAIL,
-                pass: NODEMAILER_USER_PASSWORD
+                pass: process.env.NODEMAILER_USER_PASSWORD
             }
         });
 
@@ -185,9 +185,9 @@ exports.resettingPassword = async (req, res, next) => {
 
 exports.resetPasswordForm = async (req,res,next)=>{
     const id = req.params.id;
-    const response = await ForgotPasswordModel.findOne({where:{id:id}});
+    const response = await ForgotPasswordModel.findOne({where:{id:id}}); //checking if user exists or not
     if(response){
-        const updationOfactive = await ForgotPasswordModel.update({active:false},{where:{id:id}});
+        const updationOfactive = await ForgotPasswordModel.update({active:false},{where:{id:id}});//updating the boolean value of active to falseee
         if(updationOfactive){
             res.status(200).send(`
                                 <html>

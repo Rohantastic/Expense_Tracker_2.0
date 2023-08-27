@@ -30,10 +30,21 @@
     </form>
     <div id="message"></div>
     <button id="razorPayButton">Buy Premium</button>
+
     <button id="downloadExpenseButton" style="visibility: hidden;">Download</button>
-    <button id="downloadHistory" style="visibility: hidden;">Download History</button>
+
+    <button id="dailyExpense" style="visibility: hidden;">Daily Expense</button>
+    <button id="monthlyExpense" style="visibility: hidden;">Monthly Expense</button>
+    <button id="yearlyExpense" style="visibility: hidden;">Yearly Expense</button>
+    
     <p id="premiumUserMessage"></p>
     <hr>
+
+    
+    <ul id="expenseList"></ul>
+    <ul id="dailyexpenseList"></ul>
+    <ul id="yearlyexpenseList"></ul>
+
     <h1 id="nameOfUser"></h1>
     <div id="manifest"></div>
     <div style="position: fixed; bottom: 0; width: 100%; background-color: #f0f0f0; padding: 20px; text-align: center;">
@@ -92,7 +103,9 @@
                     document.getElementById('razorPayButton').style.display = 'none';
                     showLeaderboard();
                     download(); //will only be visible for premium user
-                    downloadHistory();//show History of download
+                    monthlyExpense();//show monthly expenses
+                    yearlyExpense(); //show yearlyExpenses
+                    dailyExpense(); //shows daily Expenses
 
                 }
             } catch (error) {
@@ -150,46 +163,88 @@
             });
         }
 
-        //bonus task: to view download File History
-        function downloadHistory() {
-            const downloadButton = document.getElementById('downloadHistory');
-            downloadButton.style.visibility = 'visible';
-            downloadButton.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const downloadHistoryListHeading = document.getElementById('downloadHistoryListHeading').innerHTML = `<li> Download History List </li>`
-                axios.get('http://localhost:3000/expense/download', { headers: { "Authorization": token } }).then((response) => {
-                    if (response.status === 200) {
-                        if (response.data.fileHistory && Array.isArray(response.data.fileHistory)) {
-                            const downloadHistoryList = document.getElementById('downloadHistoryList');
-
-                            response.data.fileHistory.forEach(fileItem => {
-                                const listItem = document.createElement('li');
-                                listItem.innerHTML = `${fileItem}`;
-                                downloadHistoryList.appendChild(listItem);
-                            });
-                        } else {
-                            throw new Error("File history not found in response");
-                        }
-                    } else {
-                        throw new Error(response.statusText);
-                    }
-                }).catch((err) => {
-                    console.log(err);
-                });
+        //to view monthly expense
+        function monthlyExpense() {
+            const monthlyExpense = document.getElementById('monthlyExpense');
+            monthlyExpense.style.visibility = 'visible';
+            monthlyExpense.addEventListener('click', async (e) => {
+                const response = await axios.get('http://localhost:3000/expense/monthlyExpense', { headers: { "Authorization": token } });
+                if (response && response.data && response.data.data) {
+                    expenseList.innerHTML = '';
+                    
+                    response.data.data.forEach(expense => {
+                        const createdAtDate = new Date(expense.createdAt);
+                        const formattedDate = createdAtDate.toISOString().split('T')[0]; 
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Date: ${formattedDate}, Expense: ${expense.expense}, Category: ${expense.category}, Description: ${expense.description}`;
+                        expenseList.appendChild(listItem);
+                    });
+                } else {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `No Data Found`;
+                    expenseList.appendChild(listItem);
+                }
             });
-        }
+        };
+
+        //to view daily expense
+        function dailyExpense() {
+            const dailyExpense = document.getElementById('dailyExpense');
+            dailyExpense.style.visibility = 'visible';
+            dailyExpense.addEventListener('click', async (e) => {
+                const response = await axios.get('http://localhost:3000/expense/dailyExpense', { headers: { "Authorization": token } });
+                if (response && response.data && response.data.data) {
+                    dailyexpenseList.innerHTML = '';
+                    response.data.data.forEach(expense => {
+                        const createdAtDate = new Date(expense.createdAt);
+                        const formattedDate = createdAtDate.toISOString().split('T')[0]; 
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Date: ${formattedDate}, Expense: ${expense.expense}, Category: ${expense.category}, Description: ${expense.description}`;
+                        expenseList.appendChild(listItem);
+                    });
+                } else {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `No Data Found`;
+                    dailyexpenseList.appendChild(listItem);
+                }
+            });
+        };
+
+        //to view yearly expenses
+        function yearlyExpense() {
+            const yearlyExpense = document.getElementById('yearlyExpense');
+            yearlyExpense.style.visibility = 'visible';
+            
+            yearlyExpense.addEventListener('click', async (e) => {
+                const response = await axios.get('http://localhost:3000/expense/yearlyExpense', { headers: { "Authorization": token } });
+                if (response && response.data && response.data.data) {
+                    yearlyexpenseList.innerHTML = '';
+                    response.data.data.forEach(expense => {
+                        const createdAtDate = new Date(expense.createdAt);
+                        const formattedDate = createdAtDate.toISOString().split('T')[0]; 
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Date: ${formattedDate}, Expense: ${expense.expense}, Category: ${expense.category}, Description: ${expense.description}`;
+                        expenseList.appendChild(listItem);
+                    });
+                } else {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `No Data Found`;
+                    yearlyexpenseList.appendChild(listItem);
+                }
+            });
+        };
 
         function addNewExpenses(e) {
 
             e.preventDefault();
             var category = 'others'
-            if(e.target.category.value==='1'){
-                 category = 'fuel';
-            }else if(e.target.category.value==='2'){
-                 category = 'medicine';
+            if (e.target.category.value === '1') {
+                category = 'fuel';
+            } else if (e.target.category.value === '2') {
+                category = 'medicine';
             }
-            else if(e.target.category.value==='3'){
-                 category = 'groceries';
+            else if (e.target.category.value === '3') {
+                category = 'groceries';
             }
             const expenseDetails = {
                 expense: e.target.expense.value,
@@ -210,7 +265,7 @@
         function fetchDataFromDatabase(page) { //function to get/fetch data from database
             const dynamicpagination = document.getElementById('dynamicpagination').value;
             var page = page || 1;
-            axios.get(`http://localhost:3000/expense/getExpenses?page=${page}`, { headers: { "Authorization": token }, params: { size: dynamicpagination } }).then((response) => {
+            axios.get(`http://localhost:3000/expense/getExpenses?page=${page}&items=${dynamicpagination}`, { headers: { "Authorization": token }, params: { size: dynamicpagination } }).then((response) => {
 
                 showDataFromDatabase(response.data.expenses); //sending to function to display the data, check controller - how json is sending data to html
                 showPagination(response.data);
@@ -301,6 +356,9 @@
 
         });
 
+        document.getElementById('dynamicpagination').addEventListener('change', () => {
+        fetchDataFromDatabase(); // Call the function to fetch data immediately when the dropdown value changes
+        });
 
 
         fetchDataFromDatabase();//calling function (function call).

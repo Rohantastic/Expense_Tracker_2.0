@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 
 
 function generateAccessToken(id,ispremiumuser,name){
-    return jwt.sign({userId:id, ispremiumuser:ispremiumuser,name:name},process.env.JWT_TOKEN);//secret key
+    return jwt.sign({userId:id, ispremiumuser:ispremiumuser,name:name},process.env.JWT_TOKEN); //secret key
 }
 
 

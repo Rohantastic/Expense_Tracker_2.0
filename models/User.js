@@ -26,8 +26,6 @@ const User = database.define('user',{
         allowNull: false
     },
     ispremiumuser: DataTypes.BOOLEAN
-},{
-    timestamps:false
 });
 
 

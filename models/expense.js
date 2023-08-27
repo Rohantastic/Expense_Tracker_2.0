@@ -18,8 +18,6 @@ const Expense = database.define('expense',{
     description:{
         type: Sequelize.DataTypes.STRING
     }
-},{
-    timestamps:false
 });
 
 
