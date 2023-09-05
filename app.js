@@ -16,7 +16,7 @@ const Order = require('./models/Orders');
 const PasswordRequest = require('./models/ForgotPasswordRequests');
 const path = require('path');
 
-app.use(express.static('views'));
+app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
